@@ -1,0 +1,9 @@
+checkpoints/
+lightning_logs/
+TrainDataset/
+TestDataset/
+wandb/
+losses/
+*.ipynb
+*.pth
+.vscode/
