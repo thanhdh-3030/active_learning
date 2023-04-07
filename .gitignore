@@ -4,6 +4,9 @@ TrainDataset/
 TestDataset/
 wandb/
 losses/
+test_correlation/
 *.ipynb
 *.pth
 .vscode/
+*__pycache__*
+*.pyc

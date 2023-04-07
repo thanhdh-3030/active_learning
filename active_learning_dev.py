@@ -3,7 +3,8 @@ import torch
 import glob
 import numpy as np
 import pytorch_lightning as pl
-from torch.utils.data import DataLoader
+import segmentation_models_pytorch as smp
+from torch.utils.data import DataLoader, ConcatDataset
 import glob
 # Apply WanDB
 import wandb
@@ -13,6 +14,7 @@ from src.trainer.config import *
 from strategies import *
 from torch.utils.data.sampler import SubsetRandomSampler
 from src.evaluation.metric import full_val
+import imageio
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 import os
@@ -65,20 +67,4 @@ def eval_prioritization_strategy(prioritizer, experiment_name="Least confident",
     wandb.finish(quiet=False) 
 
     return None
-# eval_prioritization_strategy(strategies[opt.strategy], opt.exp_name,CYCLES=6, budget_size=100,use_wandb=True,device='cuda',num_epochs=opt.n_epochs,batch_size=opt.batch_size)
-if __name__=="__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--n_epochs", type=int, default=100, help="number of epochs of training")
-    parser.add_argument("--strategy",type=str,default="coreset")
-    parser.add_argument("--exp_name",type=str,default="coreset")
-    parser.add_argument("--batch_size", type=int, default=16, help="size of the batches")
-    parser.add_argument("--use_wandb", type=bool, default=False)
-
-    opt = parser.parse_args()
-    print(opt)
-    strategies={
-        'coreset':core_set_selection,
-        'coreset_en':core_set_selection_en,
-        'coreset_pca':core_set_selection_pca
-    }
-    eval_prioritization_strategy(strategies[opt.strategy], opt.exp_name,CYCLES=6, budget_size=100,use_wandb=opt.use_wandb,device='cuda',num_epochs=opt.n_epochs,batch_size=opt.batch_size)
+eval_prioritization_strategy(core_set_selection_pca, "abc",CYCLES=6, budget_size=100,use_wandb=False,device='cuda',num_epochs=2,batch_size=16)
