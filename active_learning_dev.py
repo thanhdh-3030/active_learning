@@ -20,7 +20,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 import os
 import argparse
 
-os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+# os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 def eval_prioritization_strategy(prioritizer, experiment_name="Least confident", num_cluster=3, CYCLES=10, budget_size=80, device='cuda',use_wandb=False,num_epochs=100,batch_size=32):
     if use_wandb:

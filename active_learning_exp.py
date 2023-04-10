@@ -18,9 +18,9 @@ ssl._create_default_https_context = ssl._create_unverified_context
 import os
 import argparse
 
-os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-
-def eval_prioritization_strategy(prioritizer, experiment_name="Least confident", num_cluster=3, CYCLES=10, budget_size=80, device='cuda',use_wandb=False,num_epochs=100,batch_size=32):
+# os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+torch.backends.cudnn.benchmark = True
+def eval_prioritization_strategy(prioritizer, experiment_name="Least confident", CYCLES=10, budget_size=80, device='cuda',use_wandb=False,num_epochs=100,batch_size=32):
     if use_wandb:
         wandb.init(project="Polyp Active Learning",
                 group=experiment_name,
@@ -53,7 +53,7 @@ def eval_prioritization_strategy(prioritizer, experiment_name="Least confident",
         # pool_samples=pool_samples-queried_samples                
         # train_dataset = ActivePolybDataset(labeled_samples, transform=semi_transform)
         sampler= SubsetRandomSampler(labeled_idxs)
-        train_dataloader = DataLoader(train_dataset, sampler=sampler,batch_size=16, shuffle=False, num_workers=8, pin_memory=True, prefetch_factor=8)
+        train_dataloader = DataLoader(train_dataset, sampler=sampler,batch_size=16, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=8)
         trainer = pl.Trainer(accelerator="gpu", devices=[0], max_epochs=num_epochs)
         trainer.fit(model, train_dataloaders=train_dataloader, val_dataloaders=None)
         full_val(model.model, sum(labeled_flags), device=device, use_wandb=use_wandb)
@@ -81,5 +81,6 @@ if __name__=="__main__":
         'coreset_en':core_set_selection_en,
         'coreset_pca':core_set_selection_pca,
         'bvsb':bvsb_selection,
+        'lc':least_confidence_selection
     }
     eval_prioritization_strategy(strategies[opt.strategy], opt.exp_name,CYCLES=6, budget_size=100,use_wandb=opt.use_wandb,device='cuda',num_epochs=opt.n_epochs,batch_size=opt.batch_size)
