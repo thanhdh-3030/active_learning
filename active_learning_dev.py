@@ -37,7 +37,7 @@ def eval_prioritization_strategy(prioritizer, experiment_name="Least confident",
     train_dataset = ActivePolybDataset(pool_samples, transform=semi_transform)
     labeled_flags=np.zeros(len(pool_samples), dtype=bool)
     labeled_idxs=[]
-    for cycle in range(0, CYCLES):
+    for cycle in range(1, CYCLES):
         print('*'*50, cycle, '*'*50)
         if cycle==0:
             # random select k indexs
@@ -67,4 +67,4 @@ def eval_prioritization_strategy(prioritizer, experiment_name="Least confident",
     wandb.finish(quiet=False) 
 
     return None
-eval_prioritization_strategy(core_set_selection_pca, "abc",CYCLES=6, budget_size=100,use_wandb=False,device='cuda',num_epochs=2,batch_size=16)
+eval_prioritization_strategy(bvsb_selection, "abc",CYCLES=6, budget_size=100,use_wandb=False,device='cuda',num_epochs=2,batch_size=16)

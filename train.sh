@@ -1,1 +1,1 @@
-python active_learning_coreset.py --strategy $1 --exp_name $2 --use_wandb $3
+python active_learning_exp.py --strategy $1 --exp_name $2 --use_wandb $3
