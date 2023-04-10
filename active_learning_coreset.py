@@ -79,6 +79,7 @@ if __name__=="__main__":
     strategies={
         'coreset':core_set_selection,
         'coreset_en':core_set_selection_en,
-        'coreset_pca':core_set_selection_pca
+        'coreset_pca':core_set_selection_pca,
+        'bvsb':bvsb_selection,
     }
     eval_prioritization_strategy(strategies[opt.strategy], opt.exp_name,CYCLES=6, budget_size=100,use_wandb=opt.use_wandb,device='cuda',num_epochs=opt.n_epochs,batch_size=opt.batch_size)

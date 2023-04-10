@@ -1,4 +1,4 @@
 for n in {1..6};
 do
-    python active_learning_coreset.py --strategy coreset_en --n_epochs 100 --batch_size 16 --exp_name 'Coreset-en'
+    python active_learning_coreset.py --strategy $1 --exp_name $2 --use_wandb $3
 done

@@ -3,10 +3,8 @@ lightning_logs/
 TrainDataset/
 TestDataset/
 wandb/
-losses/
-test_correlation/
+loss/
 *.ipynb
 *.pth
 .vscode/
 *__pycache__*
-*.pyc

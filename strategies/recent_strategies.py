@@ -1,6 +1,7 @@
 from src.trainer.config import *
 import numpy as np
 import torch
+from torch.utils.data.sampler import SubsetRandomSampler
 
 def enable_dropout(model):
     """ Function to enable the dropout layers during test-time """
@@ -166,9 +167,10 @@ def mc_dropout_selection(model,unlabeled_samples,budget,device='cuda:0',n_drop=5
 #     return jsd
 """## Main active learning strategy"""
 @torch.no_grad()
-def bvsb_selection(model,unlabeled_samples,budget):
-    unlabeled_set=ActivePolybDataset(unlabeled_samples,transform=semi_transform)
-    unlabeled_loader=torch.utils.data.DataLoader(unlabeled_set, batch_size=1, shuffle=False, num_workers=2)
+def bvsb_selection(model,labeled_flages,train_dataset,budget):
+    unlabeled_idxs=np.where(labeled_flages==False)
+    sampler=SubsetRandomSampler(unlabeled_idxs)
+    unlabeled_loader=torch.utils.data.DataLoader(train_dataset,sampler=sampler,batch_size=1, shuffle=False, num_workers=2)
     model.eval()
     model.to(device)
     confidence_scores=[]
@@ -179,12 +181,11 @@ def bvsb_selection(model,unlabeled_samples,budget):
         bvsb = torch.abs(2*probs - 1)
         uncertainty = 1 - bvsb
         avg_uncertainty = torch.mean(uncertainty)
-        # mean_probs=torch.sum(class_probs,dim=[-1,-2])/(logits.shape[-1]*logits.shape[-2])
         confidence_scores.append(avg_uncertainty.cpu().numpy().item())
     idxs=np.argsort(confidence_scores)
-    unlabeled_samples=np.array(unlabeled_samples)
-    queried_samples=unlabeled_samples[idxs[:budget]]
-    return queried_samples
+    query_idxs=unlabeled_idxs[idxs[:budget]] # query smallest margin samples
+    labeled_flages[query_idxs]=True
+    return query_idxs,labeled_flages
 @torch.no_grad()
 def mc_dropout_selection_true(model,unlabeled_samples,budget,device='cuda:0',n_drop=10):
     model.train()
