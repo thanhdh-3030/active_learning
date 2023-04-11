@@ -69,18 +69,22 @@ def eval_prioritization_strategy(prioritizer, experiment_name="Least confident",
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_epochs", type=int, default=100, help="number of epochs of training")
-    parser.add_argument("--strategy",type=str,default="coreset")
-    parser.add_argument("--exp_name",type=str,default="coreset")
+    parser.add_argument("--strategy",type=str,default="random")
+    parser.add_argument("--exp_name",type=str,default="Random Selection")
     parser.add_argument("--batch_size", type=int, default=16, help="size of the batches")
-    parser.add_argument("--use_wandb", type=bool, default=False)
+    parser.add_argument("--use_wandb", type=bool, default=True)
 
     opt = parser.parse_args()
     print(opt)
     strategies={
+        'random':random_selection,
+        'bvsb':bvsb_selection,
+        'lc':least_confidence_selection,
+        'coreset_de':core_set_selection_decoder,
         'coreset':core_set_selection,
         'coreset_en':core_set_selection_en,
         'coreset_pca':core_set_selection_pca,
-        'bvsb':bvsb_selection,
-        'lc':least_confidence_selection
+        'coreset_mul':mutual_core_set_selection
+
     }
     eval_prioritization_strategy(strategies[opt.strategy], opt.exp_name,CYCLES=6, budget_size=100,use_wandb=opt.use_wandb,device='cuda',num_epochs=opt.n_epochs,batch_size=opt.batch_size)

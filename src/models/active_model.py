@@ -46,6 +46,10 @@ class ActiveSegmentationModel(pl.LightningModule):
     def forward_encoder(self,image):
         embedding=self.model.encoder(image)
         return embedding
+    def forward_decoder(self,image):
+        features=self.model.encoder(image)
+        embedding=self.model.decoder(*features)
+        return embedding
     def forward_dropout(self, image, n_drop=10):
         # normalize image here
         # self.model.train()
