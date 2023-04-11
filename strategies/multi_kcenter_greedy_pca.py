@@ -43,7 +43,6 @@ def calculate_distance(emb_model,stage,labeled_flags,train_dataset,device='cuda'
     pool_loader=torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=False, num_workers=1)
     # get embeddings
     embeddings=[]
-    old_labeled_flags=labeled_flags.copy()
     for index,batch in enumerate(tqdm(pool_loader)):
         images=batch['image'].to(device)
         # embedding=emb_model.forward(images)
