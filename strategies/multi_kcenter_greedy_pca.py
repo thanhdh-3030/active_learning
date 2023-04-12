@@ -57,7 +57,7 @@ def calculate_distance(emb_model,stage,labeled_flags,train_dataset,device='cuda'
     dist_mat += sq.transpose()
     dist_mat = np.sqrt(dist_mat)
     return dist_mat
-def mutual_core_set_selection(emb_model,labeled_flags,train_dataset,budget,stages=[0,5],device='cuda'):
+def mutual_core_set_selection(emb_model,labeled_flags,train_dataset,budget,stages=[4,5],device='cuda'):
     old_labeled_flags=labeled_flags.copy()
     first_dist_mat=calculate_distance(emb_model,stages[0],labeled_flags,train_dataset,device)
     second_dist_mat=calculate_distance(emb_model,stages[1],labeled_flags,train_dataset,device)

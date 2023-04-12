@@ -4,8 +4,8 @@ from src.trainer.config import *
 @torch.no_grad()
 def core_set_selection_en(emb_model,labeled_flags,train_dataset,budget,device='cuda'):
     # dataset.initialize_labels(num=100)
-    emb_model.train()
-    print(device)
+    # emb_model.train()
+    emb_model.eval()
     emb_model.to(device)
     pool_loader=torch.utils.data.DataLoader(train_dataset, batch_size=1, shuffle=False, num_workers=1)
     # get embeddings

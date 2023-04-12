@@ -37,7 +37,7 @@ def eval_prioritization_strategy(prioritizer, experiment_name="Least confident",
     train_dataset = ActivePolybDataset(pool_samples, transform=semi_transform)
     labeled_flags=np.zeros(len(pool_samples), dtype=bool)
     labeled_idxs=[]
-    for cycle in range(0, CYCLES):
+    for cycle in range(1, CYCLES):
         print('*'*50, cycle, '*'*50)
         if cycle==0:
             # random select k indexs
