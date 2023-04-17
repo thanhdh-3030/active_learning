@@ -42,7 +42,6 @@ def core_set_selection_en(emb_model,labeled_flags,train_dataset,budget,device='c
 
 @torch.no_grad()
 def core_set_selection(emb_model,labeled_flags,train_dataset,budget,device='cuda'):
-    # dataset.initialize_labels(num=100)
     emb_model.train()
     print(device)
     emb_model.to(device)
@@ -74,5 +73,4 @@ def core_set_selection(emb_model,labeled_flags,train_dataset,budget,device='cuda
         mat = np.delete(mat, q_idx_, 0)
         mat = np.append(mat, dist_mat[~labeled_flags, q_idx][:, None], axis=1)
     query_idxs=np.arange(len(train_dataset))[(old_labeled_flags^labeled_flags)]
-    # query_samples=pool_samples[query_idxs]
     return query_idxs,labeled_flags

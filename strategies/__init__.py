@@ -6,4 +6,5 @@ from .kcenter_greedy_de import core_set_selection_decoder
 from .random import random_selection
 from .multi_kcenter_greedy import mutual_core_set_selection
 from .kcenter_greedy_stage0 import core_set_selection_first_stage
+from .uncertain_coreset import uncertain_core_set_selection
 from .recent_strategies import *

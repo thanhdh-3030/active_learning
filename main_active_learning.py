@@ -85,7 +85,8 @@ if __name__=="__main__":
         'coreset_en':core_set_selection_en,
         'coreset_pca':core_set_selection_pca,
         'coreset_mul':mutual_core_set_selection,
-        'coreset_first':core_set_selection_first_stage
+        'coreset_first':core_set_selection_first_stage,
+        'uncertain_coreset':uncertain_core_set_selection,
 
     }
     eval_prioritization_strategy(strategies[opt.strategy], opt.exp_name,CYCLES=6, budget_size=100,use_wandb=opt.use_wandb,device='cuda',num_epochs=opt.n_epochs,batch_size=opt.batch_size)
