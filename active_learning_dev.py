@@ -67,4 +67,4 @@ def eval_prioritization_strategy(prioritizer, experiment_name="Least confident",
     wandb.finish(quiet=False) 
 
     return None
-eval_prioritization_strategy(mutual_core_set_selection, "abc",CYCLES=6, budget_size=100,use_wandb=False,device='cuda',num_epochs=2,batch_size=16)
+eval_prioritization_strategy(core_set_selection_en, "abc",CYCLES=6, budget_size=100,use_wandb=False,device='cuda',num_epochs=2,batch_size=16)
