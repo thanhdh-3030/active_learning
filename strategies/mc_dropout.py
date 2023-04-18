@@ -20,6 +20,8 @@ def mc_dropout_selection(model,labeled_flags,train_dataset,budget,device='cuda',
         uncertainty_score=entropy1-entropy2
         avg_uncertainty=torch.mean(uncertainty_score)
         entropy_scores.append(avg_uncertainty.cpu().numpy().item())
+        # if index ==50:
+        #     break
     idxs=np.argsort(entropy_scores)
     query_idxs=unlabeled_idxs[0][idxs[-budget:]] # query samples have highest entropy score
     labeled_flags[query_idxs]=True
