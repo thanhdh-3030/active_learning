@@ -15,7 +15,7 @@ import pytorch_lightning as pl
 class ActiveSegmentationModel(pl.LightningModule):
 
     def __init__(self, arch='', encoder_name='', in_channels=3, out_classes=1, checkpoint_path='', labeled_dataloader=None,save_model=True, 
-                 unlabeled_dataloader=None,lr=1e-4,**kwargs):
+                 unlabeled_dataloader=None,lr=1e-4,memory_size=256,temperature=0.2,proj_dim=256,**kwargs):
         super().__init__()
         self.model = smp.create_model(
             arch, encoder_name=encoder_name, in_channels=in_channels, classes=out_classes, **kwargs
@@ -38,7 +38,59 @@ class ActiveSegmentationModel(pl.LightningModule):
             self.is_semi = False
         else: self.is_semi = True
         self.lr=lr
-        
+        self.queue_len=memory_size
+        self.proj_dim=proj_dim
+        self.temperature=temperature
+        # define queue for memory bank
+        self.register_buffer("queue",torch.randn(out_classes,self.queue_len,self.proj_dim)) # (C,M,D)
+        self.queue=torch.nn.functional.normalize(self.queue,p=2,dim=2)
+        self.register_buffer('queue_ptr',torch.zeros(out_classes,dtype=torch.long)) # (C,)
+    
+    # dequeue and enqueue for memory bank
+    def _dequeue_and_enqueue(self,keys,labels,
+                             category,bs):
+        if category not in labels:
+            return
+        keys=keys[list(labels).index(category)]
+        ptr=int(self.queue_ptr[category])
+        self.queue[category,:,ptr]=keys
+        self.queue_ptr[category]=(ptr+bs)%self.queue_len
+
+    # compute region embedding
+    def construct_region(self,feature,predict):
+        """ Construct region embeddings for all category appear in predicted mask.
+        Args:
+            feature (torch.Tensor): The embedding after upsampling with shape
+                (B,D,H,W) where D is embedding dim.
+            predict (torch.Tensor): Predicted mask with shape
+                (B,C,H,W).
+        Returns:
+            torch.Tensor: (C,D) where C is the number of category in this base.
+            torch.Tensor: (C,)
+        """
+        bs=feature.shape[0]
+        embedding_dim=feature.shape[1]
+        predict=predict.squeeze().view(bs,-1)
+        categories=torch.unique(predict)
+        feature=feature.view(bs,embedding_dim,-1)
+        region_embeddings=torch.zeros([categories,embedding_dim])
+        for category in categories:
+            cat_feature= feature[:,predict==category].mean(1).unsqueeze(0)
+            region_embeddings[category]=cat_feature
+        return region_embeddings,categories.cuda()
+    
+    def _compute_positive_contrastive_loss(self,keys,appeared_categories):
+        """ Calculate contrastive loss enfoces the embeddings of same class
+            to be close and different class far away.
+        """
+        contrast_loss=0
+        for cls_ind in appeared_categories:
+            query=keys[list(appeared_categories).index(cls_ind)] # (1,D)
+            positive_keys= self.queue[cls_ind].clone().detach() # (M,D)
+            all_ids=[i for i in range (2)] # all classes
+            neg_ids=all_ids.copy().remove(cls_ind)
+            negative_keys=self.queue[neg_ids] # 
+        return 
     def forward(self, image):
         # normalize image here
         mask = self.model(image)
